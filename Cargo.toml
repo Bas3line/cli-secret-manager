@@ -1,0 +1,19 @@
+[package]
+name = "sm"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "sm"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+clap = { version = "4.0", features = ["derive"] }
+aes-gcm = "0.10"
+hex = "0.4"
+sha2 = "0.10"
+rpassword = "7.0"
+dirs = "5.0"
+rand = "0.8"
