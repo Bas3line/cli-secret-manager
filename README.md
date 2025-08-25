@@ -62,9 +62,14 @@ Secrets are stored securely at:
 
 This project has been tested on:
 
-* **OS:** Arch Linux (x86\_64)
-* **Kernel:** Linux 6.16.1-arch1-1
-* **WM/DE:** KDE Plasma 6.4.4 (Wayland)
+## Tested Environment
+
+-------------------------------------------------------------------------------------
+| OS                    | Kernel                       | WM/DE                      |
+|-----------------------|------------------------------|----------------------------|
+| Arch Linux (x86_64)   | Linux 6.16.1-arch1-1         | KDE Plasma 6.4.4 (Wayland) |
+| Debian GNU/Linux 12   | Linux 6.1.0-38-amd64         | Cinnamon 5.6.8 (x11)       |
+-------------------------------------------------------------------------------------
 
 ## License
 
