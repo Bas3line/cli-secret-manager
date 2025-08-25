@@ -6,8 +6,9 @@ use std::path::PathBuf;
 use std::error::Error;
 
 #[derive(Serialize, Deserialize, Default)]
-struct SecretsData {
-    secrets: HashMap<String, String>,
+pub struct SecretsData {
+    pub secrets: HashMap<String, String>,
+    pub api_key: Option<String>,
 }
 
 pub struct SecretsStorage {
@@ -35,11 +36,7 @@ impl SecretsStorage {
         };
         let crypto = SecretsCrypto::new(&password);
         let data = Self::load_data(&file_path, &crypto)?;
-        Ok(Self {
-            file_path,
-            crypto,
-            data,
-        })
+        Ok(Self { file_path, crypto, data })
     }
 
     fn get_storage_path() -> Result<PathBuf, Box<dyn Error>> {
@@ -51,13 +48,9 @@ impl SecretsStorage {
     }
 
     fn load_data(file_path: &PathBuf, crypto: &SecretsCrypto) -> Result<SecretsData, Box<dyn Error>> {
-        if !file_path.exists() {
-            return Ok(SecretsData::default());
-        }
+        if !file_path.exists() { return Ok(SecretsData::default()); }
         let encrypted_content = fs::read_to_string(file_path)?;
-        if encrypted_content.is_empty() {
-            return Ok(SecretsData::default());
-        }
+        if encrypted_content.is_empty() { return Ok(SecretsData::default()); }
         let decrypted_content = crypto.decrypt(&encrypted_content)?;
         let data: SecretsData = serde_json::from_str(&decrypted_content)?;
         Ok(data)
@@ -75,25 +68,19 @@ impl SecretsStorage {
         self.save_data()?;
         Ok(())
     }
-
     pub fn get_secret(&self, name: &str) -> Result<Option<String>, Box<dyn Error>> {
         Ok(self.data.secrets.get(name).cloned())
     }
-
     pub fn list_secrets(&self) -> Result<Vec<String>, Box<dyn Error>> {
         let mut names: Vec<String> = self.data.secrets.keys().cloned().collect();
         names.sort();
         Ok(names)
     }
-
     pub fn remove_secret(&mut self, name: &str) -> Result<bool, Box<dyn Error>> {
         let removed = self.data.secrets.remove(name).is_some();
-        if removed {
-            self.save_data()?;
-        }
+        if removed { self.save_data()?; }
         Ok(removed)
     }
-
     pub fn change_password(&mut self) -> Result<(), Box<dyn Error>> {
         println!("Enter new master password: ");
         let pwd1 = rpassword::read_password()?;
@@ -105,5 +92,12 @@ impl SecretsStorage {
         self.crypto = SecretsCrypto::new(&pwd1);
         self.save_data()?;
         Ok(())
+    }
+    pub fn set_api_key(&mut self, api_key: &str) -> Result<(), Box<dyn Error>> {
+        self.data.api_key = Some(api_key.to_string());
+        self.save_data()
+    }
+    pub fn get_api_key(&self) -> Option<String> {
+        self.data.api_key.clone()
     }
 }
